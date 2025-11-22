@@ -21,7 +21,7 @@ def update_cron(job_name: str, cron_expr: str, script_path: str):
     lines = [l for l in lines if f"# {job_name}" not in l]
 
     # Adiciona novo job com comentário identificador
-    lines.append(f"{cron_expr} {os.getenv("BIN_PATH")} {script_path} # {job_name}")
+    lines.append(f"{cron_expr} {os.getenv('BIN_PATH')} {script_path} # {job_name}")
 
     # Atualiza o crontab
     new_cron = "\n".join(lines) + "\n"
