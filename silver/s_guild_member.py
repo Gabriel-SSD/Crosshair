@@ -1,10 +1,11 @@
-import json, gzip, re
-from io import BytesIO
+import re
+from datetime import datetime, timezone
+
 import pandas as pd
-from google.cloud import storage
 from dotenv import load_dotenv
 import os
-from datetime import datetime, timezone
+
+import utils
 
 load_dotenv()
 
@@ -14,21 +15,14 @@ GUILD_ID = os.getenv("GUILD_ID")
 if not GCS_BUCKET_NAME or not GUILD_ID:
     raise ValueError("Defina GCS_BUCKET_NAME e GUILD_ID no .env")
 
-storage_client = storage.Client()
-bucket = storage_client.bucket(GCS_BUCKET_NAME)
+gcs = utils.GCSClient(GCS_BUCKET_NAME)
 
 now = datetime.now(timezone.utc)
 file_path = f"{GUILD_ID}/daily/{now.year}/{now.month:02}/{now.day:02}/guild.json.gz"
-print(f"Lendo arquivo do GCS: {file_path}")
 
-def load_json_gzip_from_gcs(path):
-    blob = bucket.blob(path)
-    data = blob.download_as_bytes()
-    with gzip.GzipFile(fileobj=BytesIO(data), mode="rb") as f:
-        return json.loads(f.read().decode("utf-8"))
-
-guild_raw = load_json_gzip_from_gcs(file_path)
-print("Arquivo guild.json.gz carregado com sucesso!")
+guild_raw = gcs.load_json_gzip(file_path)
+if guild_raw is None:
+    raise ValueError(f"Falha ao carregar o arquivo {file_path}")
 
 members = guild_raw.get("member", [])
 
@@ -49,7 +43,6 @@ df_contribut.columns = [
 ]
 df_contribut["type"] = df_contribut["type"].map(lambda x: type_map.get(x, x))
 
-# Guild members
 role_map = {
     "GUILD_LEADER": "leader",
     "GUILD_OFFICER": "officer",
