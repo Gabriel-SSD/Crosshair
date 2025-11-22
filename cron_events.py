@@ -74,13 +74,13 @@ file_path = f"calendar/{now.year}/{now.month:02}/{now.day:02}/calendar.json.gz"
 # Territory War
 tw_cron = get_event_schedule("TERRITORY_WAR_EVENT", gcs, file_path)
 if tw_cron:
-    update_cron("TW_EVENT", tw_cron, f"{os.getenv("RELATIVE_PATH")}/bronze/b_twleaderboard.py")
+    update_cron("TW_EVENT", tw_cron, f"{os.getenv('RELATIVE_PATH')}/bronze/b_twleaderboard.py")
 else:
     print("Nenhum evento TW encontrado")
 
 # Territory Battle
 tb_cron = get_event_schedule("TERRITORY_BATTLE_EVENT", gcs, file_path)
 if tb_cron:
-    update_cron("TB_EVENT", tb_cron, f"{os.getenv("RELATIVE_PATH")}/bronze/b_tbleaderboard.py")
+    update_cron("TB_EVENT", tb_cron, f"{os.getenv('RELATIVE_PATH')}/bronze/b_tbleaderboard.py")
 else:
     print("Nenhum evento TB encontrado")
