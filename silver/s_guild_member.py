@@ -18,7 +18,7 @@ storage_client = storage.Client()
 bucket = storage_client.bucket(GCS_BUCKET_NAME)
 
 now = datetime.now(timezone.utc)
-file_path = f"{GUILD_ID}/{now.year}/{now.month:02}/{now.day:02}/guild.json.gz"
+file_path = f"{GUILD_ID}/daily/{now.year}/{now.month:02}/{now.day:02}/guild.json.gz"
 print(f"Lendo arquivo do GCS: {file_path}")
 
 def load_json_gzip_from_gcs(path):

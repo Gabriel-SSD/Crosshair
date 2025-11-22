@@ -39,7 +39,7 @@ def upload_json_gzip_to_gcs(data, path):
     except Exception as e:
         print(f"Falha no upload gzip {path}: {e}")
 
-folder_path = f"{guild_id}/{now.year}/{now.month:02}/{now.day:02}"
+folder_path = f"{guild_id}/daily/{now.year}/{now.month:02}/{now.day:02}"
 
 try:
     guild = comlink.get_guild(guild_id=guild_id, include_recent_guild_activity_info=True, enums=True)
