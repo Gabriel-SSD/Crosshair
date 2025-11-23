@@ -55,6 +55,7 @@ role_map = {
 df_guild_members = pd.DataFrame([
     {
         "player_id": m.get("playerId"),
+        "player_name": m.get("playerName"),
         "join_time": datetime.fromtimestamp(int(m.get("guildJoinTime") or 0), tz=timezone.utc),
         "role": m.get("memberLevel")
     }
@@ -71,7 +72,7 @@ job_members = client.load_table_from_dataframe(
     df_guild_members,
     members_table_id,
     job_config=bigquery.LoadJobConfig(
-        write_disposition="WRITE_APPEND"
+        write_disposition="WRITE_TRUNCATE"
     )
 )
 job_members.result()
