@@ -6,11 +6,14 @@ from dotenv import load_dotenv
 import os
 
 import utils
+from google.cloud import bigquery
 
 load_dotenv()
 
 GCS_BUCKET_NAME = os.getenv("GCS_BUCKET_NAME")
 GUILD_ID = os.getenv("GUILD_ID")
+BQ_PROJECT_ID = os.getenv("BQ_PROJECT_ID")
+BQ_DATASET = "silver"
 
 if not GCS_BUCKET_NAME or not GUILD_ID:
     raise ValueError("Defina GCS_BUCKET_NAME e GUILD_ID no .env")
@@ -60,7 +63,28 @@ df_guild_members = pd.DataFrame([
 df_guild_members["datetime"] = now
 df_guild_members["role"] = df_guild_members["role"].map(lambda x: role_map.get(x, x))
 
-print("Contributions:")
-print(df_contribut.head())
-print("\nGuild Members:")
-print(df_guild_members.head())
+client = bigquery.Client()
+
+members_table_id = f"{BQ_PROJECT_ID}.{BQ_DATASET}.guild_members"
+
+job_members = client.load_table_from_dataframe(
+    df_guild_members,
+    members_table_id,
+    job_config=bigquery.LoadJobConfig(
+        write_disposition="WRITE_APPEND"
+    )
+)
+job_members.result()
+
+contrib_table_id = f"{BQ_PROJECT_ID}.{BQ_DATASET}.guild_contributions"
+
+job_contrib = client.load_table_from_dataframe(
+    df_contribut,
+    contrib_table_id,
+    job_config=bigquery.LoadJobConfig(
+        write_disposition="WRITE_APPEND"
+    )
+)
+job_contrib.result()
+
+print("Dados gravados com sucesso no BigQuery!")
