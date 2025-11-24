@@ -37,9 +37,7 @@ def run_script(script_path: str):
         logger.error(f"Script não encontrado: {script_path}")
         return False
 
-    logger.info("\n" + "=" * 80)
-    logger.info(f"▶️  Iniciando etapa: {script_path}")
-    logger.info("=" * 80 + "\n")
+    logger.info(f"\n▶️  Iniciando etapa: {script_path}\n")
 
     start = time.time()
 
