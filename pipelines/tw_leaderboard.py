@@ -2,6 +2,7 @@ import subprocess
 import logging
 import time
 import os
+from dotenv import load_dotenv
 from pathlib import Path
 
 # ----------------------------
@@ -13,6 +14,9 @@ logging.basicConfig(
     handlers=[logging.FileHandler("pipeline.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger("pipeline")
+
+
+load_dotenv()
 
 # ----------------------------
 # Ordem dos pipelines TW
