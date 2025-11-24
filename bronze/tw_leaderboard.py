@@ -87,8 +87,7 @@ def main():
         match = re.search(r"O(\d+)", resp.get("territoryMapId", ""))
         if not match:
             raise ValueError(
-                f"Formato inesperado de territoryMapId: {
-                    resp.get('territoryMapId')}"
+                f"Erro inesperado no territoryMapId: {resp.get('territoryMapId')}"
             )
 
         tw_timestamp_ms = int(match.group(1))

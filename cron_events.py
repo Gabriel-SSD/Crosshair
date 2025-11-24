@@ -48,11 +48,10 @@ def update_cron(job_name: str, cron_expr: str, script_path: str):
 
     try:
         # Remover entradas antigas deste job
-        lines = [l for l in lines if f"# {job_name}" not in l]
+        lines = [line for line in lines if not line.strip().endswith(f"# {job_name}")]
 
         # Adicionar entrada nova
-        entry = f"{cron_expr} {
-            os.getenv('BIN_PATH')} {script_path} # {job_name}"
+        entry = f"{cron_expr} {os.getenv('BIN_PATH')} {script_path} # {job_name}"
         lines.append(entry)
 
         new_cron = "\n".join(lines) + "\n"
@@ -127,7 +126,6 @@ def main():
     try:
         GCS_BUCKET_NAME = load_env_var("GCS_BUCKET_NAME")
         RELATIVE_PATH = load_env_var("RELATIVE_PATH")
-        BIN_PATH = load_env_var("BIN_PATH")  # usado no cron
     except ValueError as e:
         logger.critical(f"Falha ao carregar variáveis de ambiente: {e}")
         raise SystemExit(1)

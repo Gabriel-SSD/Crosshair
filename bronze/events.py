@@ -76,9 +76,7 @@ def main():
 
         if resp["code"] != 0:
             raise RuntimeError(
-                f"A API retornou erro: code={
-                    resp['code']}, Message={
-                    resp.get('message')}"
+                f"API error: code={resp['code']}, Message={resp.get('message')}"
             )
 
         logger.info("Validação do campo 'code' concluída – resposta OK.")
@@ -94,7 +92,9 @@ def main():
         gcs = utils.GCSClient(GCS_BUCKET_NAME)
         logger.info("Cliente GCS inicializado.")
     except Exception as e:
-        logger.critical(f"Erro ao inicializar o cliente GCS: {e}", exc_info=True)
+        logger.critical(
+            f"Erro ao inicializar o cliente GCS: {e}", exc_info=True
+        )
         raise SystemExit(1)
 
     # ----------------------------------------------------
@@ -112,7 +112,9 @@ def main():
     try:
         success = gcs.upload_json_gzip(resp, file_path)
         if success:
-            logger.info(f"Upload realizado: gs://{GCS_BUCKET_NAME}/{file_path}")
+            logger.info(
+                f"Upload realizado: gs://{GCS_BUCKET_NAME}/{file_path}"
+            )
         else:
             logger.error("Falha ao enviar arquivo para o GCS.")
             raise SystemExit(1)

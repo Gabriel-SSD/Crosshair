@@ -95,10 +95,7 @@ def main():
     players = []
     members = guild.get("member", [])
 
-    logger.info(
-        f"Iniciando fetch dos jogadores: {
-            len(members)} membros encontrados."
-    )
+    logger.info(f"Iniciando coleta: {len(members)} membros encontrados.")
 
     for member in members:
         player_id = member.get("playerId")
