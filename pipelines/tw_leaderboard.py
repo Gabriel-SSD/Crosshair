@@ -18,9 +18,9 @@ logger = logging.getLogger("pipeline")
 # Ordem dos pipelines TW
 # ----------------------------
 SCRIPTS = [
-    f"{os.getenv("RELATIVE_PATH")}/bronze/tw_leaderboard.py",
-    f"{os.getenv("RELATIVE_PATH")}/silver/tw_leaderboard.py",
-    f"{os.getenv("RELATIVE_PATH")}/discord/tw_summary.py",
+    f"{os.getenv('RELATIVE_PATH')}/bronze/tw_leaderboard.py",
+    f"{os.getenv('RELATIVE_PATH')}/silver/tw_leaderboard.py",
+    f"{os.getenv('RELATIVE_PATH')}/discord/tw_summary.py",
 ]
 
 
