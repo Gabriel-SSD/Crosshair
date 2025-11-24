@@ -86,9 +86,7 @@ def main():
     try:
         match = re.search(r"O(\d+)", resp.get("territoryMapId", ""))
         if not match:
-            raise ValueError(
-                f"Erro inesperado no territoryMapId: {resp.get('territoryMapId')}"
-            )
+            raise ValueError(f"Erro inesperado no territoryMapId: {resp.get('territoryMapId')}")
 
         tw_timestamp_ms = int(match.group(1))
         tw_date = datetime.fromtimestamp(tw_timestamp_ms // 1000, tz=timezone.utc)
