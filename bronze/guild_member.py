@@ -1,41 +1,133 @@
+import os
+import logging
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from swgoh_comlink import SwgohComlink
 import utils
-import os
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+)
+logger = logging.getLogger("guild_daily")
 
 load_dotenv()
 
-guild_id = os.getenv('GUILD_ID')
-bucket_name = os.getenv('GCS_BUCKET_NAME')
 
-if not guild_id or not bucket_name:
-    raise ValueError("Certifique-se de que GUILD_ID e GCS_BUCKET_NAME estejam definidos no .env")
+# ----------------------------------------------------
+# Função utilitária para carregar variáveis de ambiente
+# ----------------------------------------------------
+def load_env_var(var_name: str) -> str:
+    value = os.getenv(var_name)
+    if not value:
+        logger.error(f"Variável de ambiente ausente: {var_name}")
+        raise ValueError(f"A variável {var_name} não está definida no .env")
+    return value
 
-storage_client = utils.GCSClient(bucket_name)
 
-comlink = SwgohComlink()
-now = datetime.now(timezone.utc)
-
-folder_path = f"{guild_id}/daily/{now.year}/{now.month:02}/{now.day:02}"
-
-try:
-    guild = comlink.get_guild(guild_id=guild_id, include_recent_guild_activity_info=True, enums=True)
-except Exception as e:
-    print(f"Falha ao buscar guild: {e}")
-    guild = {}
-
-storage_client.upload_json_gzip(guild, f"{folder_path}/guild.json.gz")
-
-players = []
-for member in guild.get("member", []):
-    player_id = member.get("playerId")
-    if not player_id:
-        continue
+def main():
+    # ----------------------------------------------------
+    # Carregar variáveis de ambiente
+    # ----------------------------------------------------
     try:
-        player_data = comlink.get_player(player_id=player_id)
-        players.append(player_data)
-    except Exception as e:
-        print(f"Falha ao buscar player {player_id}: {e}")
+        GUILD_ID = load_env_var("GUILD_ID")
+        GCS_BUCKET_NAME = load_env_var("GCS_BUCKET_NAME")
+    except ValueError as e:
+        logger.critical(f"Falha ao carregar variáveis de ambiente: {e}")
+        raise SystemExit(1)
 
-storage_client.upload_json_gzip(players, f"{folder_path}/players.json.gz")
+    # ----------------------------------------------------
+    # Inicializar clientes
+    # ----------------------------------------------------
+    try:
+        storage = utils.GCSClient(GCS_BUCKET_NAME)
+        logger.info("Cliente GCS inicializado.")
+    except Exception as e:
+        logger.critical(f"Erro ao inicializar cliente GCS: {e}", exc_info=True)
+        raise SystemExit(1)
+
+    try:
+        comlink = SwgohComlink()
+        logger.info("Cliente SwgohComlink inicializado.")
+    except Exception as e:
+        logger.critical(f"Erro ao inicializar SwgohComlink: {e}", exc_info=True)
+        raise SystemExit(1)
+
+    # ----------------------------------------------------
+    # Construir caminho de destino
+    # ----------------------------------------------------
+    now = datetime.now(timezone.utc)
+    folder_path = f"{GUILD_ID}/daily/{now.year}/{now.month:02}/{now.day:02}"
+    logger.info(f"Caminho final para upload: {folder_path}")
+
+    # ----------------------------------------------------
+    # Buscar dados da guild
+    # ----------------------------------------------------
+    try:
+        logger.info("Consultando dados da guild...")
+        guild = comlink.get_guild(
+            guild_id=GUILD_ID,
+            include_recent_guild_activity_info=True,
+            enums=True
+        )
+        logger.info("Dados da guild obtidos com sucesso.")
+    except Exception as e:
+        logger.error(f"Falha ao buscar dados da guild: {e}", exc_info=True)
+        guild = {}
+
+    # ----------------------------------------------------
+    # Upload da guild
+    # ----------------------------------------------------
+    try:
+        guild_path = f"{folder_path}/guild.json.gz"
+        success = storage.upload_json_gzip(guild, guild_path)
+        if success:
+            logger.info(f"Guild salva com sucesso: gs://{GCS_BUCKET_NAME}/{guild_path}")
+        else:
+            logger.error("Falha ao fazer upload do arquivo da guild.")
+    except Exception as e:
+        logger.error(f"Erro inesperado ao salvar guild: {e}", exc_info=True)
+
+    # ----------------------------------------------------
+    # Buscar dados dos jogadores
+    # ----------------------------------------------------
+    players = []
+    members = guild.get("member", [])
+
+    logger.info(f"Iniciando fetch dos jogadores: {len(members)} membros encontrados.")
+
+    for member in members:
+        player_id = member.get("playerId")
+        if not player_id:
+            logger.warning("Membro sem playerId encontrado, ignorando.")
+            continue
+
+        try:
+            player_data = comlink.get_player(player_id=player_id)
+            players.append(player_data)
+            logger.info(f"Player {player_id} coletado.")
+        except Exception as e:
+            logger.error(f"Falha ao buscar player {player_id}: {e}", exc_info=True)
+
+    # ----------------------------------------------------
+    # Upload dos players
+    # ----------------------------------------------------
+    try:
+        players_path = f"{folder_path}/players.json.gz"
+        success = storage.upload_json_gzip(players, players_path)
+        if success:
+            logger.info(f"Jogadores salvos com sucesso: gs://{GCS_BUCKET_NAME}/{players_path}")
+        else:
+            logger.error("Falha ao fazer upload do arquivo de players.")
+    except Exception as e:
+        logger.error(f"Erro inesperado ao salvar dados dos jogadores: {e}", exc_info=True)
+
+    logger.info("Execução concluída com sucesso.")
+
+
+# ----------------------------------------------------
+# Execução
+# ----------------------------------------------------
+if __name__ == "__main__":
+    main()
