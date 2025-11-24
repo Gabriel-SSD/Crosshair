@@ -43,12 +43,10 @@ jobs:
     # 4. Rodar lint e formatação
     # ---------------------------
     - name: Lint with flake8
-      run: |
-        flake8 .
+      run: flake8 --max-line-length=100 .
 
     - name: Check formatting with black
-      run: |
-        black --check .
+      run: black --check . --line-length 100
 
     # ---------------------------
     # 5. Rodar testes
@@ -76,4 +74,4 @@ jobs:
 
     - name: Deploy
       run: |
-        echo "Aqui você pode adicionar scripts de deploy"
+        echo "TODO"
