@@ -1,6 +1,5 @@
 import os
 import re
-import json
 import logging
 from datetime import datetime, timezone, timedelta
 from dotenv import load_dotenv
@@ -91,10 +90,10 @@ def main():
     # Criar DataFrames das métricas
     # ----------------------------------------------------
     try:
-        total   = pd.DataFrame(data.get("totalBanners", []),   columns=["memberId", "banners"])
-        attack  = pd.DataFrame(data.get("attackBanners", []),  columns=["memberId", "banners"])
+        total = pd.DataFrame(data.get("totalBanners", []), columns=["memberId", "banners"])
+        attack = pd.DataFrame(data.get("attackBanners", []), columns=["memberId", "banners"])
         defense = pd.DataFrame(data.get("defenseBanners", []), columns=["memberId", "banners"])
-        rogue   = pd.DataFrame(data.get("rogueActions", []),   columns=["memberId", "rogueActions"])
+        rogue = pd.DataFrame(data.get("rogueActions", []), columns=["memberId", "rogueActions"])
         logger.info("DataFrames de métricas criados.")
     except Exception as e:
         logger.critical(f"Erro ao criar DataFrames das métricas: {e}", exc_info=True)
@@ -119,8 +118,8 @@ def main():
     try:
         df = (
             total.merge(attack, on="player_id", how="outer")
-                 .merge(defense, on="player_id", how="outer")
-                 .merge(rogue, on="player_id", how="outer")
+            .merge(defense, on="player_id", how="outer")
+            .merge(rogue, on="player_id", how="outer")
         )
         logger.info("DataFrames mesclados com sucesso.")
     except Exception as e:
@@ -131,7 +130,12 @@ def main():
     # Normalizar colunas numéricas
     # ----------------------------------------------------
     try:
-        numeric_cols = ["total_banners", "ofensive_banners", "defensive_banners", "rogue_actions"]
+        numeric_cols = [
+            "total_banners",
+            "ofensive_banners",
+            "defensive_banners",
+            "rogue_actions",
+        ]
 
         for col in numeric_cols:
             df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -180,7 +184,7 @@ def main():
         job = client.load_table_from_dataframe(
             df,
             table_id,
-            job_config=bigquery.LoadJobConfig(write_disposition="WRITE_APPEND")
+            job_config=bigquery.LoadJobConfig(write_disposition="WRITE_APPEND"),
         )
         job.result()
         logger.info(f"Dados gravados com sucesso no BigQuery: {table_id}")

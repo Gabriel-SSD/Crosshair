@@ -86,14 +86,16 @@ def main():
         type_map = {
             "CONTRIBUTION_TYPE_TRIBUTE": "ticket",
             "CONTRIBUTION_TYPE_COMMENDATION": "token",
-            "CONTRIBUTION_TYPE_DONATION": "donation"
+            "CONTRIBUTION_TYPE_DONATION": "donation",
         }
 
-        df_contribut = pd.DataFrame([
-            {"player_id": m["playerId"], **c}
-            for m in members
-            for c in m.get("memberContribution", [])
-        ])
+        df_contribut = pd.DataFrame(
+            [
+                {"player_id": m["playerId"], **c}
+                for m in members
+                for c in m.get("memberContribution", [])
+            ]
+        )
 
         if df_contribut.empty:
             logger.warning("Nenhuma contribuição encontrada.")
@@ -121,18 +123,22 @@ def main():
         role_map = {
             "GUILD_LEADER": "leader",
             "GUILD_OFFICER": "officer",
-            "GUILD_MEMBER": "member"
+            "GUILD_MEMBER": "member",
         }
 
-        df_guild_members = pd.DataFrame([
-            {
-                "player_id": m.get("playerId"),
-                "player_name": m.get("playerName"),
-                "join_time": datetime.fromtimestamp(int(m.get("guildJoinTime") or 0), tz=timezone.utc),
-                "role": m.get("memberLevel"),
-            }
-            for m in members
-        ])
+        df_guild_members = pd.DataFrame(
+            [
+                {
+                    "player_id": m.get("playerId"),
+                    "player_name": m.get("playerName"),
+                    "join_time": datetime.fromtimestamp(
+                        int(m.get("guildJoinTime") or 0), tz=timezone.utc
+                    ),
+                    "role": m.get("memberLevel"),
+                }
+                for m in members
+            ]
+        )
 
         df_guild_members["datetime"] = now
         df_guild_members["role"] = df_guild_members["role"].map(lambda x: role_map.get(x, x))
@@ -161,7 +167,7 @@ def main():
         job_members = client.load_table_from_dataframe(
             df_guild_members,
             table_members,
-            job_config=bigquery.LoadJobConfig(write_disposition="WRITE_TRUNCATE")
+            job_config=bigquery.LoadJobConfig(write_disposition="WRITE_TRUNCATE"),
         )
         job_members.result()
         logger.info(f"Membros gravados com sucesso em {table_members}")
@@ -177,12 +183,15 @@ def main():
         job_contrib = client.load_table_from_dataframe(
             df_contribut,
             table_contrib,
-            job_config=bigquery.LoadJobConfig(write_disposition="WRITE_APPEND")
+            job_config=bigquery.LoadJobConfig(write_disposition="WRITE_APPEND"),
         )
         job_contrib.result()
         logger.info(f"Contribuições gravadas com sucesso em {table_contrib}")
     except Exception as e:
-        logger.error(f"Erro ao gravar guild_contributions no BigQuery: {e}", exc_info=True)
+        logger.error(
+            f"Erro ao gravar guild_contributions no BigQuery: {e}",
+            exc_info=True,
+        )
         raise SystemExit(1)
 
     logger.info("Execução concluída com sucesso.")

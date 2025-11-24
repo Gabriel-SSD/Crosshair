@@ -68,7 +68,7 @@ class GCSClient:
             blob.upload_from_file(
                 buffer,
                 content_type="application/octet-stream",
-                client=self.client
+                client=self.client,
             )
 
             logger.info(f"Upload concluído: gs://{self.bucket_name}/{path}")
@@ -76,8 +76,9 @@ class GCSClient:
 
         except Exception as e:
             logger.error(
-                f"Falha no upload para GCS (bucket={self.bucket_name}, path={path}): {e}",
-                exc_info=True
+                f"Falha no upload para GCS (bucket={
+                    self.bucket_name}, path={path}): {e}",
+                exc_info=True,
             )
             return False
 
@@ -106,7 +107,8 @@ class GCSClient:
 
         except Exception as e:
             logger.error(
-                f"Erro ao carregar JSON.gz do GCS (bucket={self.bucket_name}, path={path}): {e}",
-                exc_info=True
+                f"Erro ao carregar JSON.gz do GCS (bucket={
+                    self.bucket_name}, path={path}): {e}",
+                exc_info=True,
             )
             return None

@@ -69,7 +69,7 @@ def main():
         guild = comlink.get_guild(
             guild_id=GUILD_ID,
             include_recent_guild_activity_info=True,
-            enums=True
+            enums=True,
         )
         logger.info("Dados da guild obtidos com sucesso.")
     except Exception as e:
@@ -83,7 +83,7 @@ def main():
         guild_path = f"{folder_path}/guild.json.gz"
         success = storage.upload_json_gzip(guild, guild_path)
         if success:
-            logger.info(f"Guild salva com sucesso: gs://{GCS_BUCKET_NAME}/{guild_path}")
+            logger.info(f"Guild salva: gs://{GCS_BUCKET_NAME}/{guild_path}")
         else:
             logger.error("Falha ao fazer upload do arquivo da guild.")
     except Exception as e:
@@ -95,7 +95,10 @@ def main():
     players = []
     members = guild.get("member", [])
 
-    logger.info(f"Iniciando fetch dos jogadores: {len(members)} membros encontrados.")
+    logger.info(
+        f"Iniciando fetch dos jogadores: {
+            len(members)} membros encontrados."
+    )
 
     for member in members:
         player_id = member.get("playerId")
@@ -117,11 +120,14 @@ def main():
         players_path = f"{folder_path}/players.json.gz"
         success = storage.upload_json_gzip(players, players_path)
         if success:
-            logger.info(f"Jogadores salvos com sucesso: gs://{GCS_BUCKET_NAME}/{players_path}")
+            logger.info(f"Jogadores salvos: gs://{GCS_BUCKET_NAME}/{players_path}")
         else:
             logger.error("Falha ao fazer upload do arquivo de players.")
     except Exception as e:
-        logger.error(f"Erro inesperado ao salvar dados dos jogadores: {e}", exc_info=True)
+        logger.error(
+            f"Erro inesperado ao salvar dados dos jogadores: {e}",
+            exc_info=True,
+        )
 
     logger.info("Execução concluída com sucesso.")
 

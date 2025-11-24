@@ -9,7 +9,8 @@ import warnings
 
 warnings.filterwarnings(
     "ignore",
-    message="As the c extension couldn't be imported, `google-crc32c` is using a pure python implementation",
+    message="As the c extension couldn't be imported, `google-crc32c`"
+    " is using a pure python implementation",
     category=RuntimeWarning,
 )
 
@@ -37,7 +38,6 @@ def main():
     try:
         API_KEY = load_env_var("MHANN_APIKEY")
         ALLYCODE = load_env_var("ALLYCODE")
-        GUILD_ID = load_env_var("GUILD_ID")
         GCS_BUCKET_NAME = load_env_var("GCS_BUCKET_NAME")
     except ValueError as e:
         logger.critical(f"Falha ao carregar variáveis de ambiente: {e}")
@@ -76,7 +76,9 @@ def main():
 
         if resp["code"] != 0:
             raise RuntimeError(
-                f"A API retornou erro: code={resp['code']}, Message={resp.get('message')}"
+                f"A API retornou erro: code={
+                    resp['code']}, Message={
+                    resp.get('message')}"
             )
 
         logger.info("Validação do campo 'code' concluída – resposta OK.")
@@ -110,7 +112,7 @@ def main():
     try:
         success = gcs.upload_json_gzip(resp, file_path)
         if success:
-            logger.info(f"Upload realizado com sucesso: gs://{GCS_BUCKET_NAME}/{file_path}")
+            logger.info(f"Upload realizado: gs://{GCS_BUCKET_NAME}/{file_path}")
         else:
             logger.error("Falha ao enviar arquivo para o GCS.")
             raise SystemExit(1)

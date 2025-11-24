@@ -51,7 +51,8 @@ def update_cron(job_name: str, cron_expr: str, script_path: str):
         lines = [l for l in lines if f"# {job_name}" not in l]
 
         # Adicionar entrada nova
-        entry = f"{cron_expr} {os.getenv('BIN_PATH')} {script_path} # {job_name}"
+        entry = f"{cron_expr} {
+            os.getenv('BIN_PATH')} {script_path} # {job_name}"
         lines.append(entry)
 
         new_cron = "\n".join(lines) + "\n"
@@ -103,7 +104,11 @@ def get_event_schedule(event_type: str, gcs_client: utils.GCSClient, file_path: 
         end_datetime = datetime.fromtimestamp(end_time_ms / 1000, tz=timezone.utc)
 
         cron_datetime = end_datetime - timedelta(minutes=1)
-        cron_expr = f"{cron_datetime.minute} {cron_datetime.hour} {cron_datetime.day} {cron_datetime.month} *"
+        cron_expr = f"{
+            cron_datetime.minute} {
+            cron_datetime.hour} {
+            cron_datetime.day} {
+                cron_datetime.month} *"
 
         logger.info(f"Cron para {event_type}: {cron_expr}")
 

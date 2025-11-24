@@ -1,6 +1,5 @@
 import os
 import logging
-from datetime import datetime
 from dotenv import load_dotenv
 import pandas as pd
 import requests
@@ -75,7 +74,7 @@ def main():
     # Consulta SQL
     # ----------------------------------------------------
     QUERY = f"""
-    SELECT 
+    SELECT
         gm.player_name,
         tw.total_banners,
         tw.ofensive_banners,
@@ -102,8 +101,6 @@ def main():
     if df.empty:
         logger.error("Nenhum dado encontrado no BigQuery!")
         raise SystemExit(1)
-
-    table_str = df_to_table(df)
 
     # ----------------------------------------------------
     # Criar prompt para Gemini
@@ -143,15 +140,13 @@ TABLE:
     # ----------------------------------------------------
     tw_date = df["tw_date"].iloc[0].strftime("%Y-%m-%d")
 
-    payload = {
-        "content": f"**TW - {tw_date}**\n\n{summary}\n\n"
-    }
+    payload = {"content": f"**TW - {tw_date}**\n\n{summary}\n\n"}
 
     try:
         logger.info("Enviando mensagem para Discord...")
         discord_response = requests.post(DISCORD_WEBHOOK_URL, json=payload)
         if discord_response.status_code not in (200, 204):
-            raise RuntimeError(f"Discord retornou erro: {discord_response.text}")
+            raise RuntimeError("Discord retornou erro: {discord_response.text}")
         logger.info("Mensagem enviada ao Discord com sucesso.")
     except Exception as e:
         logger.error(f"Falha ao enviar mensagem ao Discord: {e}", exc_info=True)

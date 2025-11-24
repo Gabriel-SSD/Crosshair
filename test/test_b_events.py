@@ -74,7 +74,10 @@ def test_api_missing_code_field(mock_env):
 # -------------------------
 def test_api_error_code(mock_env):
     with patch("bronze.events.API") as MockAPI:
-        MockAPI.return_value.fetch_data.return_value = {"code": 500, "message": "Internal error"}
+        MockAPI.return_value.fetch_data.return_value = {
+            "code": 500,
+            "message": "Internal error",
+        }
         with pytest.raises(SystemExit):
             main()
 
@@ -121,4 +124,3 @@ def test_success_flow(mock_env, caplog):
             main()
 
     assert any("Execução concluída com sucesso" in msg for msg in caplog.text.split("\n"))
-

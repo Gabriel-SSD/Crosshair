@@ -86,7 +86,10 @@ def main():
     try:
         match = re.search(r"O(\d+)", resp.get("territoryMapId", ""))
         if not match:
-            raise ValueError(f"Formato inesperado de territoryMapId: {resp.get('territoryMapId')}")
+            raise ValueError(
+                f"Formato inesperado de territoryMapId: {
+                    resp.get('territoryMapId')}"
+            )
 
         tw_timestamp_ms = int(match.group(1))
         tw_date = datetime.fromtimestamp(tw_timestamp_ms // 1000, tz=timezone.utc)
@@ -120,7 +123,7 @@ def main():
     try:
         success = gcs.upload_json_gzip(resp, file_path)
         if success:
-            logger.info(f"Upload realizado com sucesso: gs://{GCS_BUCKET_NAME}/{file_path}")
+            logger.info(f"Upload realizado: gs://{GCS_BUCKET_NAME}/{file_path}")
         else:
             logger.error("Falha ao enviar arquivo para o GCS.")
             raise SystemExit(1)
