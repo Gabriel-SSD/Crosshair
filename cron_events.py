@@ -151,7 +151,7 @@ def main():
     tw_cron = get_event_schedule("TERRITORY_WAR_EVENT", gcs, file_path)
 
     if tw_cron:
-        script_path = f"{RELATIVE_PATH}/bronze/tw_leaderboard.py"
+        script_path = f"{RELATIVE_PATH}/pipelines/tw_leaderboard.py"
         update_cron("TW_EVENT", tw_cron, script_path)
     else:
         logger.info("Nenhum evento TW encontrado.")
@@ -163,7 +163,7 @@ def main():
     tb_cron = get_event_schedule("TERRITORY_BATTLE_EVENT", gcs, file_path)
 
     if tb_cron:
-        script_path = f"{RELATIVE_PATH}/bronze/tb_leaderboard.py"
+        script_path = f"{RELATIVE_PATH}/pipelines/tb_leaderboard.py"
         update_cron("TB_EVENT", tb_cron, script_path)
     else:
         logger.info("Nenhum evento TB encontrado.")
