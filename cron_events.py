@@ -102,12 +102,8 @@ def get_event_schedule(event_type: str, gcs_client: utils.GCSClient, file_path: 
         end_time_ms = int(instance_list[0].get("endTime"))
         end_datetime = datetime.fromtimestamp(end_time_ms / 1000, tz=timezone.utc)
 
-        cron_datetime = end_datetime - timedelta(minutes=1)
-        cron_expr = f"{
-            cron_datetime.minute} {
-            cron_datetime.hour} {
-            cron_datetime.day} {
-                cron_datetime.month} *"
+        cron_dt = end_datetime - timedelta(minutes=1)
+        cron_expr = f"{cron_dt.minute} {cron_dt.hour} {cron_dt.day} {cron_dt.month} *"
 
         logger.info(f"Cron para {event_type}: {cron_expr}")
 

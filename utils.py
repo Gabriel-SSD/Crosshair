@@ -76,8 +76,7 @@ class GCSClient:
 
         except Exception as e:
             logger.error(
-                f"Falha no upload para GCS (bucket={
-                    self.bucket_name}, path={path}): {e}",
+                f"Falha no upload para GCS (bucket={self.bucket_name}, path={path}): {e}",
                 exc_info=True,
             )
             return False
