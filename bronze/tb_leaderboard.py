@@ -91,7 +91,7 @@ def main():
     try:
         match = re.search(r"O(\d+)", resp.get("instanceId"))
         if not match:
-            raise ValueError(f"Erro inesperado no instanceId: {resp.get("instanceId")}")
+            raise ValueError(f"Erro inesperado no instanceId: {resp.get('instanceId')}")
 
         tb_timestamp_ms = int(match.group(1))
         tb_date = datetime.fromtimestamp(tb_timestamp_ms // 1000, tz=timezone.utc)
